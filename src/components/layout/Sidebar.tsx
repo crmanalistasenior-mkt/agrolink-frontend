@@ -12,7 +12,11 @@ const NAV_ITEMS = [
   { label: 'My Orders', path: '/my-orders', icon: ClipboardList, roles: ['buyer', 'admin'] },
 ];
 
-export const Sidebar = () => {
+interface Props {
+  onNavigate?: () => void;
+}
+
+export const Sidebar = ({ onNavigate }: Props) => {
   const { user, role, signOut } = useUser();
 
   const visibleItems = NAV_ITEMS.filter(item => 
@@ -36,10 +40,16 @@ export const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            onClick={onNavigate}
+            className={({ isActive }) => `
+              flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+              ${isActive 
+                ? 'bg-brand text-slate-950 shadow-[0_0_20px_rgba(34,197,94,0.3)]' 
+                : 'text-slate-400 hover:text-white hover:bg-white/5'}
+            `}
           >
-            <item.icon size={20} />
-            <span className="font-heading text-lg tracking-wide uppercase font-semibold">{item.label}</span>
+            <item.icon size={20} className={`transition-transform duration-300 group-hover:scale-110 ${false ? 'animate-pulse' : ''}`} />
+            <span className="text-sm font-bold uppercase tracking-widest">{item.label}</span>
           </NavLink>
         ))}
       </nav>

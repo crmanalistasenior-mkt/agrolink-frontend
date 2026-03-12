@@ -79,9 +79,9 @@ export default function MyProducts() {
         <p className="text-slate-500 mt-1 font-medium">Gestioná tu inventario y publicaciones activas.</p>
       </header>
 
-      <div className="flex gap-8 items-start">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Left Side: Product List (2/3) */}
-        <div className="w-2/3">
+        <div className="w-full md:w-2/3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AnimatePresence mode="popLayout">
               {myProducts.map((pub) => (
@@ -181,7 +181,7 @@ export default function MyProducts() {
         </div>
 
         {/* Right Side: Publish Form (1/3) */}
-        <div className="w-1/3">
+        <div className="w-full md:w-1/3 md:sticky md:top-8">
           <PublishForm 
             onSubmit={handleFormSubmit} 
             editingProduct={editingProduct}
