@@ -1,14 +1,16 @@
 import { useAuth } from '../context/AuthContext';
 
 export const useUser = () => {
-  const { user, loading, signIn, signOut } = useAuth();
+  const { user, loading, login, logout } = useAuth();
   
   return {
     user,
     loading,
     role: user?.role || null,
     isAuthenticated: !!user,
-    signIn,
-    signOut
+    login,
+    logout,
+    signIn: login,
+    signOut: logout
   };
 };

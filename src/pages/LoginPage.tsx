@@ -1,25 +1,31 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../hooks/useUser';
-import { Truck, CheckCircle2, Mail, Lock } from 'lucide-react';
+import { Truck, CheckCircle2, Mail, Lock, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
-  const { signIn } = useUser();
+  const { login } = useUser();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('login', email, password);
-    // Real auth later
-  };
-
-  const handleDevRole = (role: 'producer' | 'buyer' | 'transporter') => {
-    signIn(role);
-    const redirectByRole = { buyer: '/market', producer: '/dashboard', transporter: '/loads' };
-    navigate(redirectByRole[role]);
+    setError('');
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      // Wait for AuthContext session state to redirect automatically or force logic here
+      // Real auth typically relies on App-level guards, but we can emit a safe redirect
+      navigate('/');
+    } catch (err: any) {
+      setError(JSON.stringify(err, null, 2));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -87,6 +93,12 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
+            {error && (
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="text-[10px] uppercase font-bold tracking-widest text-emerald-500/70 ml-1">Email</label>
               <div className="relative">
@@ -97,6 +109,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-12 py-3.5 text-white focus:border-brand focus:outline-none transition-all placeholder:text-slate-600"
+                  disabled={isLoading}
                 />
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
               </div>
@@ -112,6 +125,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-12 py-3.5 text-white focus:border-brand focus:outline-none transition-all placeholder:text-slate-600"
+                  disabled={isLoading}
                 />
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
               </div>
@@ -119,9 +133,17 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full btn-primary py-4 uppercase tracking-widest text-xs font-bold h-14 shadow-xl shadow-brand/10"
+              disabled={isLoading}
+              className="w-full btn-primary py-4 uppercase tracking-widest text-xs font-bold h-14 shadow-xl shadow-brand/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Ingresar
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" size={18} />
+                  Procesando...
+                </>
+              ) : (
+                'Ingresar'
+              )}
             </button>
           </form>
 
@@ -129,34 +151,6 @@ export default function LoginPage() {
             <p className="text-white/40 text-sm">
               ¿No tenés cuenta? <span className="text-brand font-bold cursor-pointer hover:underline">Registrate</span>
             </p>
-          </div>
-
-          {/* Dev Role Switcher */}
-          <div className="pt-8 space-y-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/5" />
-              </div>
-              <div className="relative flex justify-center text-[10px] uppercase tracking-[0.2em] font-bold">
-                <span className="bg-[#020617] px-4 text-white/20">— dev: cambiar rol —</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-3">
-              {[
-                { label: 'Comprador', role: 'buyer' },
-                { label: 'Productor', role: 'producer' },
-                { label: 'Transportista', role: 'transporter' }
-              ].map((item) => (
-                <button
-                  key={item.role}
-                  onClick={() => handleDevRole(item.role as any)}
-                  className="bg-white/5 border border-white/10 text-white/40 text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-full hover:border-emerald-500/30 hover:text-white/60 hover:bg-white/10 transition-all"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>
