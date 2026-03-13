@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { Circle, CheckCircle2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useAppData, type LoadHistoryEntry } from '../context/AppDataContext';
+import { useNavigate } from 'react-router-dom';
+
 
 interface Props {
   load: LoadHistoryEntry;
@@ -15,18 +17,23 @@ const statusConfig = {
 export const ActiveLoadCard = ({ load }: Props) => {
   const { showToast } = useToast();
   const { advanceLoadStatus } = useAppData();
+  const navigate = useNavigate();
   const config = statusConfig[load.status];
 
-  const handleComplete = () => {
+  const handleComplete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     advanceLoadStatus(load.id);
     showToast('¡Entrega confirmada!', 'success');
   };
 
+
   return (
     <motion.div
+      onClick={() => navigate(`/my-loads/${load.id}`)}
       whileHover={{ y: -4 }}
-      className="glass-card-accent border border-white/5 hover:border-white/10 transition-all duration-300 flex flex-col p-6 h-full"
+      className="glass-card-accent border border-white/5 hover:border-white/10 transition-all duration-300 flex flex-col p-6 h-full cursor-pointer"
     >
+
       {/* Row 1: Date & Status */}
       <div className="flex justify-between items-center mb-6">
         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Aceptada: {load.accepted_date}</span>

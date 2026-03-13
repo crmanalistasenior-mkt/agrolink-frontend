@@ -5,6 +5,8 @@ import type { UserRole } from '../lib/types';
 import { AceptarCargaModal } from './AceptarCargaModal';
 import { useToast } from '../context/ToastContext';
 import { useAppData } from '../context/AppDataContext';
+import { useNavigate } from 'react-router-dom';
+
 
 interface Load {
   id: string;
@@ -33,6 +35,8 @@ export const LoadCard = ({ load, role, onAccept }: Props) => {
   const [showModal, setShowModal] = useState(false);
   const { showToast } = useToast();
   const { updateLoadStatus } = useAppData();
+  const navigate = useNavigate();
+
   
   const config = statusConfig[load.status];
   const isTransporter = role === 'transporter';
@@ -48,9 +52,11 @@ export const LoadCard = ({ load, role, onAccept }: Props) => {
   return (
     <>
       <motion.div
+        onClick={() => navigate(`/loads/${load.id}`)}
         whileHover={{ y: -4 }}
-        className="glass-card-accent border border-emerald-500/20 hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(34,197,94,0.05)] transition-all duration-300 flex flex-col p-6 h-full"
+        className="glass-card-accent border border-emerald-500/20 hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(34,197,94,0.05)] transition-all duration-300 flex flex-col p-6 h-full cursor-pointer"
       >
+
         {/* Route Section */}
         <div className="flex flex-col gap-1 mb-6">
           <div className="flex items-center gap-3">
@@ -94,9 +100,10 @@ export const LoadCard = ({ load, role, onAccept }: Props) => {
 
           {isTransporter && isAvailable && (
             <button
-              onClick={() => setShowModal(true)}
+              onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
               className="btn-primary py-2 px-5 text-xs h-9 uppercase tracking-widest"
             >
+
               Aceptar carga
             </button>
           )}

@@ -21,6 +21,12 @@ const loadStatusConfig = {
   entregada: { color: 'text-gray-500', bg: 'bg-gray-500/10', border: 'border-gray-500/20', label: 'Entregado' },
 };
 
+const getStatusConfig = (status: string) => 
+  statusConfig[status as keyof typeof statusConfig] ?? { color: 'text-slate-400', bg: 'bg-white/5', border: 'border-white/10', label: status };
+
+const getLoadStatusConfig = (status: string) => 
+  loadStatusConfig[status as keyof typeof loadStatusConfig] ?? { color: 'text-slate-400', bg: 'bg-white/5', border: 'border-white/10', label: status };
+
 export default function PublicationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,8 +42,8 @@ export default function PublicationDetail() {
     </div>
   );
 
-  const pubOrders = incomingOrders.filter(o => o.publication_id === id);
-  const pubLoads = (loads as any[]).filter(l => l.publication_id === id);
+  const pubOrders = (incomingOrders ?? []).filter(o => o.publication_id === id);
+  const pubLoads = (loads as any[] ?? []).filter(l => l.publication_id === id);
 
   const totalKgSold = pubOrders
     .filter(o => o.status === 'aceptado')
@@ -112,17 +118,23 @@ export default function PublicationDetail() {
               {pubOrders.length > 0 ? (
                 <div className="divide-y divide-white/5">
                   {pubOrders.map((order) => {
-                    const config = statusConfig[order.status as keyof typeof statusConfig];
+                    const config = getStatusConfig(order.status);
                     return (
-                      <div key={order.id} className="p-4 flex items-center justify-between gap-4">
+                      <div 
+                        key={order.id} 
+                        onClick={() => navigate(`/incoming-orders/${order.id}`)}
+                        className="p-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-white/5 transition-colors"
+                      >
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-white truncate uppercase">{order.buyer_name}</p>
-                          <p className="text-[10px] text-slate-500 font-medium">{new Date(order.date).toLocaleDateString('es-PY')}</p>
+                          <p className="text-sm font-bold text-white truncate uppercase">{order.buyer_name ?? 'Comprador'}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            {order.date ? new Date(order.date).toLocaleDateString('es-PY') : 'Fecha no disponible'}
+                          </p>
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <p className="text-xs font-bold text-white">{order.qty.toLocaleString()} KG</p>
-                            <p className="text-[10px] text-emerald-500 font-bold">{order.total.toLocaleString()} GS</p>
+                            <p className="text-xs font-bold text-white">{(order.qty ?? 0).toLocaleString()} KG</p>
+                            <p className="text-[10px] text-emerald-500 font-bold">{(order.total ?? 0).toLocaleString()} GS</p>
                           </div>
                           <div className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest border ${config.bg} ${config.color} ${config.border}`}>
                             {config.label}
@@ -130,11 +142,11 @@ export default function PublicationDetail() {
                           {order.status === 'pendiente' && (
                             <div className="flex gap-1 ml-2">
                               <button 
-                                onClick={() => rejectIncomingOrder(order.id)}
+                                onClick={(e) => { e.stopPropagation(); rejectIncomingOrder(order.id); }}
                                 className="w-8 h-8 flex items-center justify-center border border-red-500/20 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors"
                               >✕</button>
                               <button 
-                                onClick={() => acceptIncomingOrder(order.id)}
+                                onClick={(e) => { e.stopPropagation(); acceptIncomingOrder(order.id); }}
                                 className="px-3 h-8 bg-brand text-slate-950 text-[10px] font-bold rounded-lg uppercase tracking-widest"
                               >Aceptar</button>
                             </div>
@@ -162,17 +174,17 @@ export default function PublicationDetail() {
               {pubLoads.length > 0 ? (
                 <div className="divide-y divide-white/5">
                   {pubLoads.map((load) => {
-                    const lConfig = loadStatusConfig[load.status as keyof typeof loadStatusConfig];
+                    const lConfig = getLoadStatusConfig(load.status);
                     return (
                       <div key={load.id} className="p-4 flex items-center justify-between gap-4 hover:bg-white/5 transition-colors">
                         <div className="flex items-center gap-4 flex-1">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           <div>
                             <p className="text-sm font-bold text-white uppercase tracking-tight">
-                              {load.origin} → {load.destination}
+                              {load.origin ?? 'Sin origen'} → {load.destination ?? 'Sin destino'}
                             </p>
                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-                              {load.weight.toLocaleString()} KG • {load.transporter_name || 'Habilitado para flete'}
+                              {(load.weight ?? 0).toLocaleString()} KG • {load.transporter_name || 'Habilitado para flete'}
                             </p>
                           </div>
                         </div>

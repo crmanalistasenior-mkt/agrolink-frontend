@@ -99,7 +99,10 @@ export const ProductCard = ({ publication, role, onAction }: Props) => {
 
             {isBuyer && !isPaused && (
               <button 
-                onClick={() => setShowModal(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowModal(true);
+                }}
                 className="btn-primary py-2 px-4 text-xs h-9"
               >
                 Solicitar

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useToast } from '../context/ToastContext';
 import { useAppData, type IncomingOrder } from '../context/AppDataContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   order: IncomingOrder;
@@ -15,22 +16,26 @@ const statusConfig = {
 export const IncomingOrderCard = ({ order }: Props) => {
   const { showToast } = useToast();
   const { acceptIncomingOrder, rejectIncomingOrder } = useAppData();
+  const navigate = useNavigate();
   const config = statusConfig[order.status];
 
-  const handleAccept = () => {
+  const handleAccept = (e: React.MouseEvent) => {
+    e.stopPropagation();
     acceptIncomingOrder(order.id);
     showToast('Pedido aceptado — carga creada', 'success');
   };
 
-  const handleReject = () => {
+  const handleReject = (e: React.MouseEvent) => {
+    e.stopPropagation();
     rejectIncomingOrder(order.id);
     showToast('Pedido rechazado', 'warning');
   };
 
   return (
     <motion.div
+      onClick={() => navigate(`/incoming-orders/${order.id}`)}
       whileHover={{ y: -4 }}
-      className="glass-card-accent border border-white/10 hover:border-white/20 transition-all duration-300 flex flex-col p-6 h-full"
+      className="glass-card-accent border border-white/10 hover:border-white/20 transition-all duration-300 flex flex-col p-6 h-full cursor-pointer"
     >
       {/* Row 1: Date & Status */}
       <div className="flex justify-between items-center mb-6">

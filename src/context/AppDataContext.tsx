@@ -25,12 +25,25 @@ export type LoadHistoryEntry = {
   delivered_date?: string;
 };
 
+export type Producer = {
+  id: string;
+  name: string;
+  location: string;
+  department: string;
+  phone: string;
+  description: string;
+  member_since: string;
+  total_sales: number;
+  completed_orders: number;
+};
+
 interface AppDataContextType {
   publications: Publication[];
   orders: any[]; 
   loads: any[];
   incomingOrders: IncomingOrder[];
   myLoads: LoadHistoryEntry[];
+  producers: Producer[];
   addOrder: (order: any) => void;
   removePublication: (id: string) => void;
   updatePublication: (id: string, data: Partial<Publication>) => void;
@@ -46,11 +59,18 @@ interface AppDataContextType {
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
 
 const INITIAL_PUBLICATIONS: Publication[] = [
-  { id: '1', producer_id: 'p1', producer_name: 'Estancia San Jorge', product_name: 'Tomate Santa Cruz', category: 'verduras', price_per_kg: 4500, stock_kg: 1200, location_name: 'Caaguazú', is_active: true, created_at: new Date().toISOString() },
-  { id: '2', producer_id: 'p2', producer_name: 'Granja El Sol', product_name: 'Locote Verde', category: 'verduras', price_per_kg: 7000, stock_kg: 800, location_name: 'Itapúa', is_active: true, created_at: new Date().toISOString() },
-  { id: '3', producer_id: 'p3', producer_name: 'Cooperativa Fernheim', product_name: 'Mandioca', category: 'granos', price_per_kg: 1500, stock_kg: 5000, location_name: 'San Pedro', is_active: true, created_at: new Date().toISOString() },
-  { id: '4', producer_id: 'p4', producer_name: 'Agro Roque', product_name: 'Soja', category: 'granos', price_per_kg: 2100, stock_kg: 12000, location_name: 'Alto Paraná', is_active: true, created_at: new Date().toISOString() },
-  { id: '5', producer_id: 'p5', producer_name: 'Finca Vera', product_name: 'Maíz', category: 'granos', price_per_kg: 1800, stock_kg: 8500, location_name: 'Canindeyú', is_active: true, created_at: new Date().toISOString() }
+  { id: '1', producer_id: '1', producer_name: 'Estancia San Jorge', product_name: 'Tomate Santa Cruz', category: 'verduras', price_per_kg: 4500, stock_kg: 1200, location_name: 'Caaguazú', is_active: true, created_at: new Date().toISOString() },
+  { id: '2', producer_id: '2', producer_name: 'Granja El Sol', product_name: 'Locote Verde', category: 'verduras', price_per_kg: 7000, stock_kg: 800, location_name: 'Itapúa', is_active: true, created_at: new Date().toISOString() },
+  { id: '3', producer_id: '3', producer_name: 'Cooperativa Fernheim', product_name: 'Mandioca', category: 'granos', price_per_kg: 1500, stock_kg: 5000, location_name: 'San Pedro', is_active: true, created_at: new Date().toISOString() },
+  { id: '4', producer_id: '4', producer_name: 'Agro Roque', product_name: 'Soja', category: 'granos', price_per_kg: 2100, stock_kg: 12000, location_name: 'Alto Paraná', is_active: true, created_at: new Date().toISOString() },
+  { id: '5', producer_id: '1', producer_name: 'Estancia San Jorge', product_name: 'Maíz', category: 'granos', price_per_kg: 1800, stock_kg: 8500, location_name: 'Caaguazú', is_active: true, created_at: new Date().toISOString() }
+];
+
+const INITIAL_PRODUCERS: Producer[] = [
+  { id:'1', name:'Estancia San Jorge', location:'Caaguazú', department:'Caaguazú', phone:'+595 981 123 456', description:'Productores de tomate y locote desde 1998. Trabajamos con técnicas orgánicas y entrega garantizada en todo el país.', member_since:'2024-01', total_sales:45000000, completed_orders:38 },
+  { id:'2', name:'Granja El Sol', location:'Itapúa', department:'Itapúa', phone:'+595 982 234 567', description:'Especialistas en locote verde y pimiento. Finca familiar con certificación sanitaria vigente.', member_since:'2024-03', total_sales:28000000, completed_orders:24 },
+  { id:'3', name:'Cooperativa Fernheim', location:'San Pedro', department:'San Pedro', phone:'+595 983 345 678', description:'Cooperativa agrícola con más de 50 productores asociados. Mandioca y granos de alta calidad.', member_since:'2023-11', total_sales:92000000, completed_orders:87 },
+  { id:'4', name:'Agro Roque', location:'Alto Paraná', department:'Alto Paraná', phone:'+595 984 456 789', description:'Producción de soja y maíz a gran escala. Logística propia disponible para grandes volúmenes.', member_since:'2024-02', total_sales:67000000, completed_orders:61 },
 ];
 
 const INITIAL_ORDERS = [
@@ -83,6 +103,7 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
   const [loads, setLoads] = useState<any[]>(INITIAL_LOADS);
   const [incomingOrders, setIncomingOrders] = useState<IncomingOrder[]>(INITIAL_INCOMING_ORDERS);
   const [myLoads, setMyLoads] = useState<LoadHistoryEntry[]>(INITIAL_MY_LOADS);
+  const [producers] = useState<Producer[]>(INITIAL_PRODUCERS);
 
   const addOrder = (order: any) => {
     setOrders(prev => [order, ...prev]);
@@ -150,7 +171,7 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppDataContext.Provider value={{
-      publications, orders, loads, incomingOrders, myLoads,
+      publications, orders, loads, incomingOrders, myLoads, producers,
       addOrder, removePublication, updatePublication, addPublication,
       updateLoadStatus, acceptIncomingOrder, rejectIncomingOrder, advanceLoadStatus,
       cancelOrder, togglePublicationStatus

@@ -77,12 +77,12 @@ export default function ProducerDashboard() {
           </div>
 
           <div className="space-y-3">
-            {pendingRecent.length > 0 ? (
+            {(pendingRecent ?? []).length > 0 ? (
               pendingRecent.map((order) => (
                 <div key={order.id} className="glass-card p-4 border border-white/5 flex items-center justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate uppercase">{order.buyer_name}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">{order.product} • {order.qty}kg</p>
+                    <p className="text-sm font-bold text-white truncate uppercase">{order.buyer_name ?? 'Comprador'}</p>
+                    <p className="text-[10px] text-slate-500 font-medium">{order.product ?? 'Producto'} • {(order.qty ?? 0)}kg</p>
                   </div>
                   <div className="flex gap-2">
                     <button 
@@ -119,7 +119,7 @@ export default function ProducerDashboard() {
           </div>
 
           <div className="space-y-3">
-            {myRecentPubs.length > 0 ? (
+            {(myRecentPubs ?? []).length > 0 ? (
               myRecentPubs.map((pub) => (
                 <div key={pub.id} className="glass-card p-4 border border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -127,9 +127,9 @@ export default function ProducerDashboard() {
                         {pub.category === 'verduras' ? '🥦' : '🌾'}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white uppercase tracking-tight">{pub.product_name}</p>
+                      <p className="text-sm font-bold text-white uppercase tracking-tight">{pub.product_name ?? 'Sin nombre'}</p>
                       <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                         {pub.price_per_kg.toLocaleString()} GS/KG • {pub.stock_kg.toLocaleString()} KG
+                         {(pub.price_per_kg ?? 0).toLocaleString()} GS/KG • {(pub.stock_kg ?? 0).toLocaleString()} KG
                       </p>
                     </div>
                   </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import { useToast } from '../context/ToastContext';
 import { ArrowLeft, Package, DollarSign, MapPin, Truck, Calendar } from 'lucide-react';
@@ -16,7 +16,7 @@ const statusConfig = {
 export default function OrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { orders, cancelOrder } = useAppData();
+  const { orders, cancelOrder, producers } = useAppData();
   const { showToast } = useToast();
   const [isCancelling, setIsCancelling] = useState(false);
 
@@ -28,7 +28,12 @@ export default function OrderDetail() {
     </div>
   );
 
-  const config = statusConfig[order.status as keyof typeof statusConfig];
+  const producerId = producers.find(p => p.name === order.producer)?.id || '1';
+
+  const getStatusConfig = (status: string) => 
+    statusConfig[status as keyof typeof statusConfig] ?? { color: 'text-slate-400', bg: 'bg-white/5', border: 'border-white/10', label: status };
+
+  const config = getStatusConfig(order.status);
 
   const handleCancelConfirm = () => {
     cancelOrder(order.id);
@@ -75,15 +80,17 @@ export default function OrderDetail() {
             <div className="flex flex-wrap gap-4">
               <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
                 <Package size={16} className="text-slate-500" />
-                <span className="text-sm font-bold text-slate-300">{order.qty.toLocaleString()} KG</span>
+                <span className="text-sm font-bold text-slate-300">{(order.qty ?? 0).toLocaleString()} KG</span>
               </div>
               <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
                 <DollarSign size={16} className="text-emerald-500/60" />
-                <span className="text-sm font-bold text-white">{order.total.toLocaleString()} GS</span>
+                <span className="text-sm font-bold text-white">{(order.total ?? 0).toLocaleString()} GS</span>
               </div>
               <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
                 <Calendar size={16} className="text-slate-500" />
-                <span className="text-sm font-medium text-slate-400">{new Date(order.date).toLocaleDateString('es-PY')}</span>
+                <span className="text-sm font-medium text-slate-400">
+                  {order.date ? new Date(order.date).toLocaleDateString('es-PY') : 'Sin fecha'}
+                </span>
               </div>
             </div>
           </section>
@@ -91,16 +98,17 @@ export default function OrderDetail() {
           {/* Producer Section */}
           <section className="space-y-4">
             <h2 className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.2em]">Productor</h2>
-            <div className="glass-card p-6 border border-white/5 flex items-center justify-between">
+            <Link to={`/producer/${producerId}`} className="glass-card p-6 border border-white/5 flex items-center justify-between group hover:border-white/20 transition-all cursor-pointer">
               <div>
-                <p className="text-lg font-bold text-white uppercase tracking-tight">{order.producer}</p>
-                <p className="text-sm text-slate-500 font-medium">Ubicación verificada</p>
+                <p className="text-lg font-bold text-white uppercase tracking-tight group-hover:text-emerald-400 transition-colors">{order.producer ?? 'Sin productor'}</p>
+                <p className="text-sm text-slate-500 font-medium group-hover:text-slate-400 transition-colors">Ver perfil público →</p>
               </div>
-              <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500">
+              <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
                 <MapPin size={24} />
               </div>
-            </div>
+            </Link>
           </section>
+
 
           {/* Transporte Section */}
           <section className="space-y-4">
@@ -147,7 +155,7 @@ export default function OrderDetail() {
                   <div className="border-l border-white/10 h-6 ml-[3px] my-1" />
                   <div className="flex items-center gap-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-xs font-bold text-white uppercase tracking-tight">{order.destination}</span>
+                    <span className="text-xs font-bold text-white uppercase tracking-tight">{order.destination ?? 'Sin destino'}</span>
                   </div>
                 </div>
               </div>
@@ -189,18 +197,18 @@ export default function OrderDetail() {
                 </div>
                 <div className="flex justify-between text-xs font-medium">
                   <span className="text-slate-500 underline decoration-white/10 underline-offset-4 decoration-dotted">Cantidad</span>
-                  <span className="text-white">{order.qty.toLocaleString()} KG</span>
+                  <span className="text-white">{(order.qty ?? 0).toLocaleString()} KG</span>
                 </div>
                 <div className="flex justify-between text-xs font-medium">
                   <span className="text-slate-500 underline decoration-white/10 underline-offset-4 decoration-dotted">Precio Base</span>
-                  <span className="text-white">{(order.total / order.qty).toLocaleString()} GS / KG</span>
+                  <span className="text-white">{((order.total ?? 0) / (order.qty || 1)).toLocaleString()} GS / KG</span>
                 </div>
                 
                 <div className="pt-4 border-t border-white/5 flex justify-between items-baseline">
                   <span className="text-sm font-bold text-white uppercase font-heading">Total</span>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-emerald-500 font-heading leading-none">
-                      {order.total.toLocaleString()}
+                      {(order.total ?? 0).toLocaleString()}
                     </p>
                     <p className="text-[10px] uppercase font-bold text-emerald-500/40 mt-1">Guaraníes</p>
                   </div>

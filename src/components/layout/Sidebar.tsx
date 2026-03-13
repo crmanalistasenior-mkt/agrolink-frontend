@@ -1,14 +1,15 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { ShoppingBag, Truck, Package, ClipboardList, LogOut, UserCircle, Inbox, LayoutDashboard } from 'lucide-react';
 import { useUser } from '../../hooks/useUser';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['producer'] },
+  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['producer', 'buyer', 'transporter'] },
   { label: 'Market', path: '/market', icon: ShoppingBag, roles: ['buyer', 'producer', 'transporter'] },
   { label: 'Loads', path: '/loads', icon: Truck, roles: ['transporter', 'admin'] },
   { label: 'Mis Cargas', path: '/my-loads', icon: Truck, roles: ['transporter', 'admin'] },
   { label: 'My Products', path: '/my-products', icon: Package, roles: ['producer', 'admin'] },
   { label: 'Pedidos Recibidos', path: '/incoming-orders', icon: Inbox, roles: ['producer', 'admin'] },
+  { label: 'Mi Perfil Público', path: '/producer/1', icon: UserCircle, roles: ['producer'] },
   { label: 'My Orders', path: '/my-orders', icon: ClipboardList, roles: ['buyer', 'admin'] },
 ];
 
@@ -55,15 +56,15 @@ export const Sidebar = ({ onNavigate }: Props) => {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-white/5 flex flex-col gap-4">
-        <div className="flex items-center gap-3 px-2">
-          <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400">
+        <Link to="/settings" onClick={onNavigate} className="flex items-center gap-3 px-2 cursor-pointer group hover:bg-white/5 p-2 rounded-xl transition-colors">
+          <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-emerald-400 transition-colors">
             <UserCircle size={24} />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-white leading-none">{user?.full_name}</span>
+            <span className="text-sm font-bold text-white leading-none group-hover:text-emerald-400 transition-colors">{user?.full_name}</span>
             <span className="text-[10px] font-bold text-green-500 uppercase tracking-wider mt-1">{user?.role}</span>
           </div>
-        </div>
+        </Link>
         
         <button 
           onClick={signOut}
